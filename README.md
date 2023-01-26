@@ -4,39 +4,47 @@
 
 ## 项目简介
 
-项目功能：保存QQ好友发送的文本消息、图片消息、文件至云端，同时将其发送至另一QQ好友，方便实时获取消息。  
+***项目功能***：保存QQ好友发送的文本消息、图片消息、文件至云端，同时将其发送至另一QQ好友，方便实时获取消息。  
 
-项目版本：1.0.0  
+***项目版本***：1.0.0  
 
-项目技术框架：go-cqhttp(v1.0.0-rc4)、nginx(1.21.5)  
+***项目技术框架***：go-cqhttp(v1.0.0-rc4)、nginx(1.21.5)  
 
-项目部署服务器：CentOs 7.x（其他服务器自行部署）
+***项目部署服务器***：CentOs 7.x（其他服务器自行部署）
 
-项目语言：python  
+***项目语言***：python  
 
 ## 项目结构说明
-images：好友发送的图片存储位置  
-files：好友发送的文件（包括视频）存储位置  
-allfiles：类似于日志文件，存储图片以及文件的基本信息  
-config.ini：项目配置文件，配置[点这里]{#index}  
-logger.log：日志文件  
-loggertool：日志处理工具  
-main.py：项目入口程序  
-qqapi.py：功能实现核心api    
-README.md：项目说明文档  
+***images***：好友发送的图片存储位置  
+***files***：好友发送的文件（包括视频）存储位置  
+***allfiles***：类似于日志文件，存储图片以及文件的基本信息  
+***config.ini***：项目配置文件，配置详情见后文    
+***logger.log***：日志文件  
+***loggertool***：日志处理工具  
+***main.py***：项目入口程序  
+***qqapi.py***：功能实现核心api    
+***README.md***：项目说明文档  
 
 
 ## 项目部署指南  
 
 首先，本项目基于go-cqhttp以及nginx，需要先对go-cqhttp以及nginx进行配置。  
 
-go-cqhttp的官网：  
+***go-cqhttp的官网***   
 
 <https://docs.go-cqhttp.org>  
 
-nginx的官网： 
+![下载文件解压后执行下述命令](/md_pics/2.png)  
+![修改配置文件config.yml](/md_pics/3.png)   
+![](/md_pics/6.png)   
+![再次执行命令go-cqhttp](/md_pics/4.png)   
+![结果如下则为成功](/md_pics/5.png)
+
+***nginx的官网***  
 
 <http://nginx.org/>
+
+![nginx的配置文件nginx.conf添加一处代理](/md_pics/7.png) 
 
 配置好go-cqhttp以及nginx之后，本项目才能正常运行。
 
@@ -46,7 +54,7 @@ nginx的官网：
 
 `git clone https://github.com/ly-sixibiheye/qqbot.git`  
 
-### 项目配置{#ini}
+### 项目配置
 接着修改配置项目文件中，配置文件为config.ini。  
 
 ```ini
