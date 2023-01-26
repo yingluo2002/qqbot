@@ -64,7 +64,7 @@ nginx配置完毕。
 `git clone https://github.com/ly-sixibiheye/qqbot.git`  
 
 ### 项目配置
-接着修改配置项目文件中，配置文件为***config.ini***。  
+接着修改配置项目文件，配置文件为***config.ini***。  
 
 ```ini
 [server]
