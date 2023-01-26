@@ -43,13 +43,7 @@
 ![](./md_pics/3.png)   
 ![](./md_pics/6.jpg)  
 
-配置文件修改后，再次执行命令go-cqhttp：  
-
-![](./md_pics/4.png)     
-
-结果如下则为成功：  
-
-![](./md_pics/5.png)
+至此go-cqhttp服务配置完毕。
 
 ***nginx的官网***  
 
