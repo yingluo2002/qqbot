@@ -34,19 +34,23 @@
 
 <https://docs.go-cqhttp.org>  
 
-![下载文件解压后执行下述命令](/md_pics/2.png)  
-![修改配置文件config.yml](/md_pics/3.png)   
-![](/md_pics/6.png)   
-![再次执行命令go-cqhttp](/md_pics/4.png)   
-![结果如下则为成功](/md_pics/5.png)
+下载文件解压后执行下述命令：  
+![](./md_pics/2.png)  
+修改配置文件config.yml：
+![](./md_pics/3.png)   
+![](./md_pics/6.jpg)  
+配置文件修改后，再次执行命令go-cqhttp：
+![](./md_pics/4.png)   
+结果如下则为成功：
+![](./md_pics/5.png)
 
 ***nginx的官网***  
 
 <http://nginx.org/>
+在nginx的配置文件nginx.conf中，添加一个代理：  
+![](./md_pics/7.png) 
 
-![nginx的配置文件nginx.conf添加一处代理](/md_pics/7.png) 
-
-配置好go-cqhttp以及nginx之后，本项目才能正常运行。
+配置好go-cqhttp以及nginx之后，项目才能正常运行。
 
 ### 拉取项目
 
