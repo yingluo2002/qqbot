@@ -53,16 +53,18 @@
 
 ![](./md_pics/7.png)   
 
-配置好go-cqhttp以及nginx之后，项目才能正常运行。
+nginx配置完毕。  
+
+配置好go-cqhttp以及nginx之后，再来配置项目。
 
 ### 拉取项目
 
-首先使用git命令拉取项目文件：  
+首先使用***git***命令拉取项目文件：  
 
 `git clone https://github.com/ly-sixibiheye/qqbot.git`  
 
 ### 项目配置
-接着修改配置项目文件中，配置文件为config.ini。  
+接着修改配置项目文件中，配置文件为***config.ini***。  
 
 ```ini
 [server]
@@ -98,7 +100,7 @@ stream_handler_level = DEBUG
 
 ```  
 
-配置完成后，依次运行命令：  
+配置完成后，在服务器上，依次运行命令：  
 
 1. nohup go-cqhttp > /dev/null &
 2. nginx
