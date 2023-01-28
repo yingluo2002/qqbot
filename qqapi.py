@@ -107,7 +107,7 @@ def parse_message(rev):
 
                 logger.info(f'收到来自【{qq}】的图片URL地址----【http://{server_ip}:{nginx_port}/qqsource/images/{name}.jpg】')
 
-    if rev["post_type"] == "notice":
+    if rev["post_type"] == 'notice' and rev['notice_type'] == 'offline_file':
         qq = rev['user_id']
         filename = rev['file']['name']
         size = bytes2human(int(rev['file']['size']))
