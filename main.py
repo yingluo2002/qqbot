@@ -41,9 +41,6 @@ def rev_msg(q):
 
 if __name__ == '__main__':
 
-    if not os.path.exists('images'):
-        os.mkdir('./images')
-
     if not os.path.exists('files'):
         os.mkdir('files')
 

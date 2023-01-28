@@ -30,6 +30,24 @@ def send_private_msg(number, message):
         logger.error(f'Error occurred: {e}')
 
 
+# 获取撤回的消息
+def get_recall_msg(id):
+    try:
+        msg = requests.get(url=f'http://{local_ip}:{receive_server_port}/get_msg?message_id={id}').json()
+        return msg
+    except Exception as e:
+        logger.error(f'Error occurred: {e}')
+
+
+# 根据group_id获取群名
+def get_group_name_by_id(id):
+    try:
+        msg = requests.get(url=f'http://{local_ip}:{receive_server_port}/get_group_info?group_id={id}').json()
+        return msg['data']['group_memo'] if 'group_memo' in msg['data'] else msg['data']['group_name']
+    except Exception as e:
+        logger.error(f'Error occurred: {e}')
+
+
 # 将字节数转化为合适的大小单位
 def bytes2human(n):
     symbols = ('K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y')
@@ -39,16 +57,6 @@ def bytes2human(n):
         order = int(math.log2(n) / 10)
         human_readable = n / (1 << (order * 10))
         return f"{human_readable:.1f}{symbols[order - 1]}"
-
-
-# 下载图片的线程
-def download_image(name, url):
-    try:
-        with open(f'./images/{name}.jpg', 'wb') as f:
-            img = requests.get(url).content
-            f.write(img)
-    except Exception as e:
-        logger.error(f'Error occurred: {e}')
 
 
 # 下载文件的线程
@@ -61,54 +69,41 @@ def download_file(filename, url):
         logger.error(f'Error occurred: {e}')
 
 
-# 记录图片和文件数据的线程
-def list_msg(currenttime, nickname, name):
-    try:
-        with open('./allfiles', 'a') as f:
-            f.write(
-                f'\n【{currenttime}】----{nickname}----{name}----【http://{server_ip}:{nginx_port}/qqsource/images/{name}.jpg】')
-    except Exception as e:
-        logger.error(f'Error occurred: {e}')
-
-
 def parse_message(rev):
-    if rev["post_type"] == "message":
-        # QQ文字及表情符号，和收藏的表情包
-        if rev["message_type"] == "private":
+    if 'notice_type' in rev and rev['notice_type'] in ['friend_recall', 'group_recall']:
+        message = get_recall_msg(rev['message_id'])
+        recall_time = time.strftime('%Y.%m.%d %H:%M:%S ', time.localtime(rev['time']))
+        recall_qq = f"{rev['user_id']}(来自群：{get_group_name_by_id(rev['group_id'])})" if 'group_id' in rev else rev['user_id']
 
-            qq = rev['sender']['user_id']
-            nickname = rev['sender']['nickname']
-            message = rev['raw_message']
-            currenttime = time.strftime('%Y.%m.%d %H:%M:%S ', time.localtime(rev['time']))
+        # 可能的bug
+        if 'data' in message and message['data'] is None:
+            return
 
-            match = re.search(r'file=(\w+).*?url=(\S+)', message)
+        if 'data' in message and 'message' in message['data']:
+
+            raw_message = message['data']['message']
+            send_time = time.strftime('%Y.%m.%d %H:%M:%S ', time.localtime(message['data']['time']))
+
+            match = re.search(r'file=(\w+).*?url=(\S+)', raw_message)
 
             if not match:  # 如果不匹配，说明是普通消息
-                msg = f'【{currenttime}】\n收到来自{qq}的消息：\n【{message}】。'
+                msg = f'收到{recall_qq}撤回的消息：\n【{raw_message}】\n发送时间：【{send_time}】\n撤回时间：【{recall_time}】。'
                 Thread(target=send_private_msg, args=(myqq, msg)).start()
-                logger.info(f'收到来自【{qq}】的消息：----【{message}】。')
+                logger.info(f'【{recall_qq}】撤回一条消息：----【{raw_message}】。')
 
             else:  # 如果匹配，说明是一张图片
-                name = match.group(1)
                 url = match.group(2)
 
-                # 启动下载图片的线程
-                Thread(target=download_image, args=(name, url)).start()
-
-                msg = f'【{currenttime}】\n收到来自【{qq}】的图片URL地址：'
+                msg = f'收到{recall_qq}撤回的图片：\n-------------------------\n{raw_message}-------------------------\n发送时间：【{send_time}】\n撤回时间：【{recall_time}】。'
 
                 # 启动发送消息的线程
                 Thread(target=send_private_msg, args=(myqq, msg)).start()
-                Thread(target=send_private_msg,
-                       args=(myqq, f'http://{server_ip}:{nginx_port}/qqsource/images/{name}.jpg')).start()
 
-                # 启动记录数据的线程
-                Thread(target=list_msg, args=(currenttime, nickname, name)).start()
+                logger.info(f'【{recall_qq}】撤回一张图片：----【{url}】。')
 
-                logger.info(f'收到来自【{qq}】的图片URL地址----【http://{server_ip}:{nginx_port}/qqsource/images/{name}.jpg】')
+    if 'post_type' in rev and 'notice_type' in rev and rev["post_type"] == 'notice' and rev['notice_type'] in ['offline_file', 'group_upload']:
 
-    if rev["post_type"] == 'notice' and rev['notice_type'] == 'offline_file':
-        qq = rev['user_id']
+        qq = f"{rev['user_id']}(来自群：{get_group_name_by_id(rev['group_id'])})" if 'group_id' in rev else rev['user_id']
         filename = rev['file']['name']
         size = bytes2human(int(rev['file']['size']))
         url = rev['file']['url']
@@ -118,13 +113,12 @@ def parse_message(rev):
 
         currenttime = time.strftime('%Y.%m.%d %H:%M:%S ', time.localtime(rev['time']))
 
-        msg = f'【{currenttime}】\n收到来自【{qq}】的文件：\n1.名称：{filename}\n2.大小：{size}\n3.URL：'
-
-        # 启动记录数据的线程
-        Thread(target=list_msg, args=(currenttime, qq, filename)).start()
+        msg = f'【{currenttime}】\n收到来自【{qq}】的文件：\n1.名称：{filename}\n2.大小：{size}。'
 
         # 启动发送消息的线程
         Thread(target=send_private_msg, args=(myqq, msg)).start()
-        Thread(target=send_private_msg, args=(myqq, f'http://{server_ip}:{nginx_port}/qqsource/files/{filename}')).start()
+        Thread(target=send_private_msg,
+               args=(myqq, f'http://{server_ip}:{nginx_port}/qqsource/files/{filename}')).start()
 
-        logger.info(f'收到来自【{qq}】的文件----【名称：{filename}】----【大小：{size}】----【URL：http://{server_ip}:{nginx_port}/qqsource/files/{filename}】')
+        logger.info(
+            f'收到来自【{qq}】的文件----【名称：{filename}】----【大小：{size}】----【URL：http://{server_ip}:{nginx_port}/qqsource/files/{filename}】')
