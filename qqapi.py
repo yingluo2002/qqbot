@@ -100,7 +100,7 @@ def parse_message(rev):
                 # 启动发送消息的线程
                 Thread(target=send_private_msg, args=(myqq, msg)).start()
                 Thread(target=send_private_msg,
-                       args=(myqq, f'http://{local_ip}:{nginx_port}/qqsource/images/{name}.jpg')).start()
+                       args=(myqq, f'http://{server_ip}:{nginx_port}/qqsource/images/{name}.jpg')).start()
 
                 # 启动记录数据的线程
                 Thread(target=list_msg, args=(currenttime, nickname, name)).start()
