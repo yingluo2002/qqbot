@@ -70,6 +70,10 @@ def download_file(filename, url):
 
 
 def parse_message(rev):
+    # 忽略空数据包
+    if rev is None:
+        return
+
     if 'notice_type' in rev and rev['notice_type'] in ['friend_recall', 'group_recall']:
         message = get_recall_msg(rev['message_id'])
         recall_time = time.strftime('%Y.%m.%d %H:%M:%S ', time.localtime(rev['time']))
