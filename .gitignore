@@ -11,6 +11,7 @@
 **/.springBeans
 **/.factorypath
 .idea/
+./venv
 *.iml
 /bin/
 **/bin/
