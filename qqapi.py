@@ -1,11 +1,11 @@
 import math
-import re
 import time
-import requests
-from threading import Thread
-from loggertool import Logger
-
 import configparser
+from threading import Thread
+
+import requests
+
+from loggertool import Logger
 
 # 创建 ConfigParser 对象
 config = configparser.ConfigParser()
@@ -70,43 +70,32 @@ def download_file(filename, url):
 
 
 def parse_message(rev):
-    # 忽略空数据包
-    if rev is None:
-        return
-
     if 'notice_type' in rev and rev['notice_type'] in ['friend_recall', 'group_recall']:
         message = get_recall_msg(rev['message_id'])
-        recall_time = time.strftime('%Y.%m.%d %H:%M:%S ', time.localtime(rev['time']))
-        recall_qq = f"{rev['user_id']}(来自群：{get_group_name_by_id(rev['group_id'])})" if 'group_id' in rev else rev['user_id']
+        recall_time = time.strftime('%Y.%m.%d %H:%M:%S ', time.localtime())
+        recall_qq = f"{rev['user_id']}(来自群：{get_group_name_by_id(rev['group_id'])})" if 'group_id' in rev else rev[
+            'user_id']
 
         # 可能的bug
         if 'data' in message and message['data'] is None:
+            Thread(target=send_private_msg, args=(myqq, '暂不支持此类消息。')).start()
             return
 
         if 'data' in message and 'message' in message['data']:
-
             raw_message = message['data']['message']
             send_time = time.strftime('%Y.%m.%d %H:%M:%S ', time.localtime(message['data']['time']))
 
-            match = re.search(r'file=(\w+).*?url=(\S+)', raw_message)
+            if raw_message == '&#91;&#91;QQ小程序&#93;收集表&#93;请使用最新版本手机QQ查看':
+                raw_message = 'QQ收集表（暂不支持查看）'
 
-            if not match:  # 如果不匹配，说明是普通消息
-                msg = f'收到{recall_qq}撤回的消息：\n【{raw_message}】\n发送时间：【{send_time}】\n撤回时间：【{recall_time}】。'
-                Thread(target=send_private_msg, args=(myqq, msg)).start()
-                logger.info(f'【{recall_qq}】撤回一条消息：----【{raw_message}】。')
+            msg = f'收到{recall_qq}撤回的消息：\n-------------------------\n{raw_message}\n-------------------------\n发送于【{send_time}】\n撤回于【{recall_time}】'
 
-            else:  # 如果匹配，说明是一张图片
-                url = match.group(2)
+            Thread(target=send_private_msg, args=(myqq, msg)).start()
+            logger.info(f'【{recall_qq}】撤回一条消息：----【{raw_message}】。')
 
-                msg = f'收到{recall_qq}撤回的图片：\n-------------------------\n{raw_message}-------------------------\n发送时间：【{send_time}】\n撤回时间：【{recall_time}】。'
-
-                # 启动发送消息的线程
-                Thread(target=send_private_msg, args=(myqq, msg)).start()
-
-                logger.info(f'【{recall_qq}】撤回一张图片：----【{url}】。')
+            return
 
     if 'post_type' in rev and 'notice_type' in rev and rev["post_type"] == 'notice' and rev['notice_type'] in ['offline_file', 'group_upload']:
-
         qq = f"{rev['user_id']}(来自群：{get_group_name_by_id(rev['group_id'])})" if 'group_id' in rev else rev['user_id']
         filename = rev['file']['name']
         size = bytes2human(int(rev['file']['size']))
@@ -126,3 +115,4 @@ def parse_message(rev):
 
         logger.info(
             f'收到来自【{qq}】的文件----【名称：{filename}】----【大小：{size}】----【URL：http://{server_ip}:{nginx_port}/qqsource/files/{filename}】')
+        return

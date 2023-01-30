@@ -14,6 +14,7 @@ config = configparser.ConfigParser()
 config.read('config.ini')
 local_ip = config['server']['local_ip']
 send_server_port = int(config['server']['send_server_port'])
+once_max_recv = int(config['server']['once_max_recv'])
 
 logger = Logger().logger
 
@@ -32,7 +33,7 @@ def request_to_json(msg):
 
 def rev_msg(q):
     Client, Address = ListenSocket.accept()
-    Request = Client.recv(1024).decode(encoding='utf-8', errors='ignore')
+    Request = Client.recv(once_max_recv).decode(encoding='utf-8', errors='ignore')
     rev_json = request_to_json(Request)
     Client.sendall(HttpResponseHeader.encode(encoding='utf-8'))
     Client.close()
