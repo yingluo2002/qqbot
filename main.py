@@ -1,11 +1,11 @@
-import os
+import configparser
 import json
 import socket
-from queue import Queue
-import qqapi
 import threading
+from queue import Queue
+
+import qqapi
 from loggertool import Logger
-import configparser
 
 # 创建 ConfigParser 对象
 config = configparser.ConfigParser()
@@ -41,9 +41,6 @@ def rev_msg(q):
 
 
 if __name__ == '__main__':
-
-    if not os.path.exists('files'):
-        os.mkdir('files')
 
     logger.info("监控服务已开启......")
 
