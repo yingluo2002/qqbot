@@ -1,21 +1,20 @@
 # qqbot 说明文档
 
-本项目基于go-cqhttp框架以及nginx服务，为QQ防撤回消息提供一种技术解决方案。  
+本项目基于go-cqhttp，为QQ开发一个消息防撤回插件。  
 
 ## 项目简介
 
-***项目功能***：保存QQ好友撤回的文本消息、图片消息、文件至云端，同时将其发送至另一QQ好友，便于实时获取消息。  
+***项目功能***：保存QQ好友撤回的文本消息、图片消息、文件，将其发送至另一QQ好友（小号）。  
 
-***项目版本***：2.0.0  
+***项目版本***：2.1.0  
 
 ***项目技术框架***：go-cqhttp(v1.0.0-rc4)、nginx(1.21.5)  
 
 ***项目部署服务器***：CentOs 7.x（其他服务器自行部署）
 
-***项目语言***：python>=3.8.0  
+***项目语言***：python >= 3.8.0  
 
-## 项目结构说明
-***files***：好友发送的文件（包括视频）存储位置（自动生成）  
+## 项目结构说明 
 ***config.ini***：项目配置文件，配置详情见后文    
 ***logger.log***：日志文件（自动生成）  
 ***loggertool***：日志处理工具类  
@@ -38,7 +37,7 @@
 
 ## 项目部署指南  
 
-首先，本项目基于go-cqhttp以及nginx，需要先对go-cqhttp以及nginx进行配置。  
+本项目基于go-cqhttp以及nginx，需要先对go-cqhttp以及nginx进行配置。  
 
 ***go-cqhttp的官网***   
 
@@ -65,7 +64,7 @@
 
 nginx配置完毕。  
 
-配置好go-cqhttp以及nginx之后，再来配置项目。
+配置好go-cqhttp以及nginx之后，再来配置本项目。
 
 ### 拉取项目
 
@@ -96,9 +95,11 @@ send_server_port = 5701
 # 一次接收go-cqhttp数据包的最大大小
 once_max_recv = 4096
 
-[nginx]
-# nginx服务开放的端口，与nginx配置文件设置的端口保持一致
-nginx_port = 8888
+# 文件中转路径，服务器上暂存的文件路径，自行修改
+file_middle_path = /home/qqchat/qqfiles
+
+# 文件是否缓存在服务器上，为true时会自动删除，其余时不会
+delete_middle_file = true
 
 
 [logger]
@@ -109,15 +110,14 @@ handler_file_name = logger.log
 file_handler_level = DEBUG
 
 # 控制台日志输出级别，自行设置
-stream_handler_level = DEBUG
+stream_handler_level = ERROR
 
 ```  
 
 配置完成后，在服务器上，依次运行命令：  
 
 1. nohup go-cqhttp > /dev/null &
-2. nginx
-3. nohup python ./main.py > ./message.txt &  
+2. nohup python ./main.py > ./message.txt &  
 
 命令中日志存储文件路径可自行设置，注意main.py启动文件的路径。
 
