@@ -8,7 +8,7 @@
 
 ***项目版本***：2.1.0  
 
-***项目技术框架***：go-cqhttp(v1.0.0-rc4)、nginx(1.21.5)  
+***项目技术基础***：go-cqhttp(v1.0.0-rc4)   
 
 ***项目部署服务器***：CentOs 7.x（其他服务器自行部署）
 
@@ -37,7 +37,7 @@
 
 ## 项目部署指南  
 
-本项目基于go-cqhttp以及nginx，需要先对go-cqhttp以及nginx进行配置。  
+本项目基于go-cqhttp，需要先对go-cqhttp进行配置。  
 
 ***go-cqhttp的官网***   
 
@@ -52,19 +52,9 @@
 ![](./md_pics/3.png)   
 ![](./md_pics/6.jpg)  
 
-至此go-cqhttp服务配置完毕。
+至此go-cqhttp服务配置完毕。  
 
-***nginx的官网***  
-
-<http://nginx.org/>  
-
-在nginx的配置文件nginx.conf中，添加一个代理：    
-
-![](./md_pics/7.png)   
-
-nginx配置完毕。  
-
-配置好go-cqhttp以及nginx之后，再来配置本项目。
+配置好go-cqhttp之后，再来配置本项目。
 
 ### 拉取项目
 
@@ -114,12 +104,12 @@ stream_handler_level = ERROR
 
 ```  
 
-配置完成后，在服务器上，依次运行命令：  
+配置完成后，在服务器上后台运行本项目即可。参考命令：  
 
 1. nohup go-cqhttp > /dev/null &
 2. nohup python ./main.py > ./message.txt &  
 
-命令中日志存储文件路径可自行设置，注意main.py启动文件的路径。
+命令中日志存储文件路径自行设置，注意main.py启动文件的路径。
 
 至此项目部署完毕。
 
